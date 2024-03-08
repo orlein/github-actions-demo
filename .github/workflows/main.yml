@@ -20,7 +20,7 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'pnpm'
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm install --frozen-lockfile
 
   test:
     needs: install_dependencies
@@ -37,6 +37,8 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'pnpm'
+      - name: Restore dependencies
+        run: pnpm install --frozen-lockfile
       - name: Run Tests
         run: pnpm run test:cov
 
@@ -54,6 +56,8 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'pnpm'
+      - name: Restore dependencies
+        run: pnpm install --frozen-lockfile
       - name: Build
         run: pnpm run builds
       - name: Zip
