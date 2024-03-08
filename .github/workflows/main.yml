@@ -45,7 +45,6 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'pnpm'
       - name: Run Tests
         run: pnpm run test:cov
 
@@ -58,7 +57,6 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'pnpm'
       - name: Build
         run: pnpm run builds
       - name: Zip
