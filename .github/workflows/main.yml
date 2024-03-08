@@ -42,8 +42,8 @@ jobs:
       - name: Run Tests
         run: pnpm run test:cov
 
-  deploy:
-    needs: install_dependencies
+  build:
+    needs: [install_dependencies, test]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -59,8 +59,6 @@ jobs:
       - name: Restore dependencies
         run: pnpm install --frozen-lockfile
       - name: Build
-        run: pnpm run builds
+        run: pnpm run build
       - name: Zip
         run: pnpm run zip
-      - name: Deploy
-        run: pnpm run deploy
