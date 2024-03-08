@@ -1,27 +1,60 @@
-name: Node.js CI
+env:
+  NODE_VERSION: '20.x'
 
 on: [push, pull_request]
 
 jobs:
-  build-and-test:
+  install_dependencies:
     runs-on: ubuntu-latest
+    outputs:
+      cache-key: ${{ steps.setup-node.outputs.cache-key }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Node.js with pnpm cache
+        id: setup-node
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+          run_install: false
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+      - name: Install dependencies
+        run: pnpm install
 
-    strategy:
-      matrix:
-        node-version: ["20.x"]
+  test:
+    needs: install_dependencies
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v2
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
+      - name: Use Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v2
         with:
-          node-version: ${{ matrix.node-version }}
-      - name: Cache Node.js modules
-        uses: actions/cache@v2
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-      - name: Install Dependencies
-        run: npm install
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
       - name: Run Tests
-        run: npm test
+        run: pnpm run test:cov
+
+  deploy:
+    needs: install_dependencies
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+      - name: Build
+        run: pnpm run builds
+      - name: Zip
+        run: pnpm run zip
+      - name: Deploy
+        run: pnpm run deploy
