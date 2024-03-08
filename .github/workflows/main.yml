@@ -11,6 +11,9 @@ jobs:
       cache-key: ${{ steps.setup-node.outputs.cache-key }}
     steps:
       - uses: actions/checkout@v4
+      - name: check env
+        run: |
+          echo $NODE_VERSION
       - name: Setup Node.js with pnpm cache
         id: setup-node
         uses: actions/setup-node@v3
