@@ -1,0 +1,40 @@
+env:
+  NODE_VERSION: '20.x'
+  TZ: 'Asia/Seoul'
+
+on:
+  push:
+    branches:
+      - 'release/**'
+  pull_request:
+    branches:
+      - 'release/**'
+
+jobs:
+  build_and_deploy:
+    runs-on: ubuntu-latest
+    if: contains(github.ref, 'refs/heads/release/')
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+      - name: Use Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+      - name: Restore dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Build
+        run: pnpm run build
+      - name: Zip
+        run: pnpm run zip
+      - name: Upload zip as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: artifact
+          path: artifact.zip
+      - name: Deploy
+        run: echo "Deploying to production server"
