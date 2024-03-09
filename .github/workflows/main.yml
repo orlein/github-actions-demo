@@ -25,7 +25,6 @@ jobs:
   test:
     needs: install_dependencies
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
       - name: Install pnpm
@@ -42,8 +41,8 @@ jobs:
       - name: Run Tests
         run: pnpm run test:cov
 
-  build:
-    needs: [install_dependencies, test]
+  build_and_deploy:
+    needs: test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -62,3 +61,5 @@ jobs:
         run: pnpm run build
       - name: Zip
         run: pnpm run zip
+      - name: Deploy
+        run: echo "Deploying to production server"
