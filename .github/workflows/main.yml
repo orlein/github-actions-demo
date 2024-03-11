@@ -4,10 +4,12 @@ env:
 
 on:
   pull_request:
+    branches-ignore:
+      - 'release/**' # This ignores PRs targeting branches that match the pattern, but further filtering might be necessary in jobs
     types: [opened, synchronize, reopened]
   push:
-    branches:
-      - '**'
+    branches-ignore:
+      - 'release/**' # This tries to ignore pushes to branches that match the pattern, but further filtering might be necessary in jobs
   pull_request_review:
     types: [submitted]
 
