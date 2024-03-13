@@ -1,0 +1,1 @@
+web: NO_COLOR=true node dist/main.js
